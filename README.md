@@ -20,166 +20,295 @@ DATABASE_URL=
 4.Start the server to test the project locally.
 npm start
 
+# PaddyCure API Documentation
 
-User
-Mendaftarkan akun user
-Endpoint: POST /users/register
-Deskripsi: Endpoint ini digunakan untuk mendaftarkan akun pengguna baru.
-Body Request:
-id: ID pengguna
-nama: Nama pengguna
-img: URL gambar pengguna
-nomor_hp: Nomor HP pengguna
-role: Peran pengguna
-username: Username pengguna
-password: Password pengguna
-Mendapatkan detail user berdasarkan ID
-Endpoint: GET /users/userDetail/:id
-Deskripsi: Endpoint ini digunakan untuk mendapatkan detail pengguna berdasarkan ID.
-Mendapatkan detail user berdasarkan nama
-Endpoint: GET /users/search/nama/:nama
-Deskripsi: Endpoint ini digunakan untuk mendapatkan detail pengguna berdasarkan nama.
-Menampilkan semua data user
-Endpoint: GET /users
-Deskripsi: Endpoint ini digunakan untuk menampilkan semua data pengguna.
-Mengubah data user berdasarkan ID
-Endpoint: PUT /users/update/:id
-Deskripsi: Endpoint ini digunakan untuk mengubah data pengguna berdasarkan ID.
-Body Request: Data pengguna yang ingin diubah.
-Menghapus data user berdasarkan ID
-Endpoint: DELETE /users/delete/:id
-Deskripsi: Endpoint ini digunakan untuk menghapus data pengguna berdasarkan ID.
-Berita
-Menampilkan semua berita
-Endpoint: GET /berita
-Deskripsi: Endpoint ini digunakan untuk menampilkan semua berita.
-Mendapatkan berita berdasarkan judul
-Endpoint: GET /berita/search/judul/:judul
-Deskripsi: Endpoint ini digunakan untuk mendapatkan berita berdasarkan judul.
-Mendapatkan berita berdasarkan penulis
-Endpoint: GET /berita/search/penulis/:penulis
-Deskripsi: Endpoint ini digunakan untuk mendapatkan berita berdasarkan penulis.
-Mendapatkan berita berdasarkan isi
-Endpoint: GET /berita/search/isi/:isi
-Deskripsi: Endpoint ini digunakan untuk mendapatkan berita berdasarkan isi.
-Mendapatkan berita berdasarkan image
-Endpoint: GET /berita/search/image/:image
-Deskripsi: Endpoint ini digunakan untuk mendapatkan berita berdasarkan gambar.
-Mendapatkan berita berdasarkan waktu
-Endpoint: GET /berita/search/timeStamp/:timeStamp
-Deskripsi: Endpoint ini digunakan untuk mendapatkan berita berdasarkan timestamp.
-Mendapatkan berita berdasarkan ID
-Endpoint: GET /berita/search/id/:id
-Deskripsi: Endpoint ini digunakan untuk mendapatkan berita berdasarkan ID.
-Memasukkan data berita
-Endpoint: POST /berita/input
-Deskripsi: Endpoint ini digunakan untuk memasukkan data berita baru.
-Body Request:
-id: ID berita
-judul_berita: Judul berita
-penulis: Penulis berita
-isi_berita: Isi berita
-img_berita: URL gambar berita
-Mengubah berita
-Endpoint: PUT /berita/update/:id
-Deskripsi: Endpoint ini digunakan untuk mengubah berita berdasarkan ID.
-Body Request: Data berita yang ingin diubah.
-Menghapus berita
-Endpoint: DELETE /berita/delete/:id
-Deskripsi: Endpoint ini digunakan untuk menghapus berita berdasarkan ID.
-Produk
-Menampilkan produk
-Endpoint: GET /produk
-Deskripsi: Endpoint ini digunakan untuk menampilkan semua produk.
-Mendapatkan detail produk berdasarkan ID
-Endpoint: GET /produk/search/id/:id
-Deskripsi: Endpoint ini digunakan untuk mendapatkan detail produk berdasarkan ID.
-Mendapatkan detail produk berdasarkan nama
-Endpoint: GET /produk/search/nama_produk/:nama_produk
-Deskripsi: Endpoint ini digunakan untuk mendapatkan detail produk berdasarkan nama.
-Memasukkan data produk
-Endpoint: POST /produk/insert-produk
-Deskripsi: Endpoint ini digunakan untuk memasukkan data produk baru.
-Body Request:
-id: ID produk
-user_id: ID pengguna
-id_produk: ID produk
-img_produk: URL gambar produk
-harga_produk: Harga produk
-detail_produk: Detail produk
-stok_produk: Stok produk
-Mengubah data produk berdasarkan ID
-Endpoint: PUT /produk/update/:id
-Deskripsi: Endpoint ini digunakan untuk mengubah data produk berdasarkan ID.
-Body Request: Data produk yang ingin diubah.
-Menghapus data produk berdasarkan ID
-Endpoint: DELETE /produk/delete/:id
-Deskripsi: Endpoint ini digunakan untuk menghapus data produk berdasarkan ID.
-Order
-Menampilkan semua barang pesanan
-Endpoint: GET /order
-Deskripsi: Endpoint ini digunakan untuk menampilkan semua barang pesanan.
-Menampilkan barang pesanan berdasarkan ID user
-Endpoint: GET /order/:idUser
-Deskripsi: Endpoint ini digunakan untuk menampilkan barang pesanan berdasarkan ID user.
-Memasukkan barang ke dalam pesanan
-Endpoint: POST /order/input
-Deskripsi: Endpoint ini digunakan untuk memasukkan barang ke dalam pesanan.
-Body Request: Data barang yang ingin dimasukkan.
-Menghapus barang pesanan dari keranjang
-Endpoint: DELETE /order/delete
-Deskripsi: Endpoint ini digunakan untuk menghapus barang pesanan dari keranjang.
-Mengubah barang pesanan
-Endpoint: PUT /order/ubah
-Deskripsi: Endpoint ini digunakan untuk mengubah barang pesanan.
-Body Request: Data barang yang ingin diubah.
-Disease
-Menampilkan semua data detail penyakit
-Endpoint: GET /disease/diseaseDetails
-Deskripsi: Endpoint ini digunakan untuk menampilkan semua data detail penyakit.
-Menampilkan data detail penyakit berdasarkan ID
-Endpoint: GET /disease/paddyDetail/:id
-Deskripsi: Endpoint ini digunakan untuk menampilkan data detail penyakit berdasarkan ID.
-Membuat data penyakit
-Endpoint: POST /disease/create
-Deskripsi: Endpoint ini digunakan untuk membuat data penyakit baru.
-Body Request:
-id: ID penyakit
-user_id: ID pengguna
-nama_penyakit: Nama penyakit
-tentang_penyakit: Deskripsi tentang penyakit
-product_recomendation: Rekomendasi produk
-timestamp: Timestamp penyakit
-Paddy
-Membuat data padi
-Endpoint: POST /paddy/create
-Deskripsi: Endpoint ini digunakan untuk membuat data padi baru.
-Body Request:
-id: ID padi
-user_id: ID pengguna
-img_padi: URL gambar padi
-catatan: Catatan padi
-deskripsi: Deskripsi padi
-id_disease: ID penyakit
-Menampilkan semua data padi
-Endpoint: GET /paddy/paddyDetails
-Deskripsi: Endpoint ini digunakan untuk menampilkan semua data padi.
-Menampilkan data padi berdasarkan ID
-Endpoint: GET /paddy/paddyDetail/:id
-Deskripsi: Endpoint ini digunakan untuk menampilkan data padi berdasarkan ID.
-Mengubah data padi berdasarkan ID
-Endpoint: PUT /paddy/update/:id
-Deskripsi: Endpoint ini digunakan untuk mengubah data padi berdasarkan ID.
-Body Request: Data padi yang ingin diubah.
-Menghapus data padi berdasarkan ID
-Endpoint: DELETE /paddy/delete/:id
-Deskripsi: Endpoint ini digunakan untuk menghapus data padi berdasarkan ID.
-Login
-Menggenerate token untuk login
-Endpoint: POST /users/login
-Deskripsi: Endpoint ini digunakan untuk menggenerate token untuk login.
-Body Request:
-username: Username pengguna
-password: Password pengguna
-Harap dicatat bahwa ini hanya merupakan representasi teks dari dokumentasi backend yang Anda berikan. Pastikan untuk mengonfirmasi dan menyesuaikan dengan kode aktual Anda.
+![PaddyCure Logo](https://drive.google.com/uc?id=1JqG6Ox5Kw45GkjV9sZzg0VFcp_GYGbTo)
+
+## Users
+
+### Register User Account
+
+**Endpoint**: `POST /users/register`
+
+**Description**: This endpoint is used to register a new user account.
+
+**Request Body**:
+- id: User ID
+- nama: User's name
+- img: User's image URL
+- nomor_hp: User's phone number
+- role: User's role
+- username: User's username
+- password: User's password
+
+### Get User Details by ID
+
+**Endpoint**: `GET /users/userDetail/:id`
+
+**Description**: This endpoint is used to retrieve user details by ID.
+
+### Get User Details by Name
+
+**Endpoint**: `GET /users/search/nama/:nama`
+
+**Description**: This endpoint is used to retrieve user details by name.
+
+### Get All User Data
+
+**Endpoint**: `GET /users`
+
+**Description**: This endpoint is used to retrieve all user data.
+
+### Update User Data by ID
+
+**Endpoint**: `PUT /users/update/:id`
+
+**Description**: This endpoint is used to update user data by ID.
+
+**Request Body**: User data to be updated.
+
+### Delete User Data by ID
+
+**Endpoint**: `DELETE /users/delete/:id`
+
+**Description**: This endpoint is used to delete user data by ID.
+
+## News
+
+### Get All News
+
+**Endpoint**: `GET /berita`
+
+**Description**: This endpoint is used to retrieve all news.
+
+### Get News by Title
+
+**Endpoint**: `GET /berita/search/judul/:judul`
+
+**Description**: This endpoint is used to retrieve news by title.
+
+### Get News by Author
+
+**Endpoint**: `GET /berita/search/penulis/:penulis`
+
+**Description**: This endpoint is used to retrieve news by author.
+
+### Get News by Content
+
+**Endpoint**: `GET /berita/search/isi/:isi`
+
+**Description**: This endpoint is used to retrieve news by content.
+
+### Get News by Image
+
+**Endpoint**: `GET /berita/search/image/:image`
+
+**Description**: This endpoint is used to retrieve news by image.
+
+### Get News by Timestamp
+
+**Endpoint**: `GET /berita/search/timeStamp/:timeStamp`
+
+**Description**: This endpoint is used to retrieve news by timestamp.
+
+### Get News by ID
+
+**Endpoint**: `GET /berita/search/id/:id`
+
+**Description**: This endpoint is used to retrieve news by ID.
+
+### Insert News Data
+
+**Endpoint**: `POST /berita/input`
+
+**Description**: This endpoint is used to insert new news data.
+
+**Request Body**:
+- id: News ID
+- judul_berita: News title
+- penulis: News author
+- isi_berita: News content
+- img_berita: News image URL
+
+### Update News
+
+**Endpoint**: `PUT /berita/update/:id`
+
+**Description**: This endpoint is used to update news by ID.
+
+**Request Body**: News data to be updated.
+
+### Delete News
+
+**Endpoint**: `DELETE /berita/delete/:id`
+
+**Description**: This endpoint is used to delete news by ID.
+
+## Products
+
+### Get All Products
+
+**Endpoint**: `GET /produk`
+
+**Description**: This endpoint is used to retrieve all products.
+
+### Get Product Details by ID
+
+**Endpoint**: `GET /produk/search/id/:id`
+
+**Description**: This endpoint is used to retrieve product details by ID.
+
+### Get Product Details by Name
+
+**Endpoint**: `GET /produk/search/nama_produk/:nama_produk`
+
+**Description**: This endpoint is used to retrieve product details by name.
+
+### Insert Product Data
+
+**Endpoint**: `POST /produk/insert-produk`
+
+**Description**: This endpoint is used to insert new product data.
+
+**Request Body**:
+- id: Product ID
+- user_id: User ID
+- id_produk: Product ID
+- img_produk: Product image URL
+- harga_produk: Product price
+- detail_produk: Product details
+- stok_produk: Product stock
+
+### Update Product Data by ID
+
+**Endpoint**: `PUT /produk/update/:id`
+
+**Description**: This endpoint is used to update product data by ID.
+
+**Request Body**: Product data to be updated.
+
+### Delete Product Data by ID
+
+**Endpoint**: `DELETE /produk/delete/:id`
+
+**Description**: This endpoint is used to delete product data by ID.
+
+## Orders
+
+### Get All Order Items
+
+**Endpoint**: `GET /order`
+
+**Description**: This endpoint is used to retrieve all order items.
+
+### Get Order Items by User ID
+
+**Endpoint**: `GET /order/:idUser`
+
+**Description**: This endpoint is used to retrieve order items by user ID.
+
+### Add Item to Order
+
+**Endpoint**: `POST /order/input`
+
+**Description**: This endpoint is used to add an item to the order.
+
+**Request Body**: Item data to be added.
+
+### Remove Item from Order
+
+**Endpoint**: `DELETE /order/delete`
+
+**Description**: This endpoint is used to remove an item from the order.
+
+### Update Order Item
+
+**Endpoint**: `PUT /order/ubah`
+
+**Description**: This endpoint is used to update an order item.
+
+**Request Body**: Item data to be updated.
+
+## Diseases
+
+### Get All Disease Details
+
+**Endpoint**: `GET /disease/diseaseDetails`
+
+**Description**: This endpoint is used to retrieve all disease details.
+
+### Get Disease Details by ID
+
+**Endpoint**: `GET /disease/paddyDetail/:id`
+
+**Description**: This endpoint is used to retrieve disease details by ID.
+
+### Create Disease Data
+
+**Endpoint**: `POST /disease/create`
+
+**Description**: This endpoint is used to create new disease data.
+
+**Request Body**:
+- id: Disease ID
+- user_id: User ID
+- nama_penyakit: Disease name
+- tentang_penyakit: Description about the disease
+- product_recomendation: Product recommendation
+- timestamp: Disease timestamp
+
+## Paddy
+
+### Create Paddy Data
+
+**Endpoint**: `POST /paddy/create`
+
+**Description**: This endpoint is used to create new paddy data.
+
+**Request Body**:
+- id: Paddy ID
+- user_id: User ID
+- img_padi: Paddy image URL
+- catatan: Paddy notes
+- deskripsi: Paddy description
+- id_disease: Disease ID
+
+### Get All Paddy Data
+
+**Endpoint**: `GET /paddy/paddyDetails`
+
+**Description**: This endpoint is used to retrieve all paddy data.
+
+### Get Paddy Data by ID
+
+**Endpoint**: `GET /paddy/paddyDetail/:id`
+
+**Description**: This endpoint is used to retrieve paddy data by ID.
+
+### Update Paddy Data by ID
+
+**Endpoint**: `PUT /paddy/update/:id`
+
+**Description**: This endpoint is used to update paddy data by ID.
+
+**Request Body**: Paddy data to be updated.
+
+### Delete Paddy Data by ID
+
+**Endpoint**: `DELETE /paddy/delete/:id`
+
+**Description**: This endpoint is used to delete paddy data by ID.
+
+## Login
+
+### Generate Login Token
+
+**Endpoint**: `POST /users/login`
+
+**Description**: This endpoint is used to generate a login token.
+
+**Request Body**:
+- username: User's username
+- password: User's password
+
 
