@@ -1,0 +1,421 @@
+const express = require('express');
+const router = express.Router();
+const Multer  = require('multer');
+const { Storage } = require('@google-cloud/storage');
+const verifikasiUser = require('./verifikasi/verivikasi');
+const db = require('./../databaseDanConfignya/connection');
+const numbers = require('nanoid-generate/numbers');
+
+// Inisialisasi Google Cloud Storage
+const storage = new Storage({
+  projectId: 'tepar-388403',
+  keyFilename: './serviceaccountkey.json'
+});
+const bucketName = 'image-paddy';
+
+// Konfigurasi Multer untuk upload file
+const multer = Multer({
+  storage: Multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5 MB
+  }
+});
+
+router.post("/register", multer.single('img'), (req, res) => {
+  const users = {
+    id: numbers(3),
+    name: req.body.nama,
+    role: req.body.role,
+    nomorHP: req.body.nomorHP,
+    username: req.body.username,
+    password: req.body.password
+  };
+
+  let query = `SELECT * FROM user WHERE username = '${users.username}'`;
+  db.query(query, (err, result) => {
+    if (err) {
+      res.status(500).send("error ambil data");
+    } else {
+      if (result.length > 0) {
+        res.status(500).send("username telah digunakan");
+      } else {
+        if (req.file) {
+          // Upload gambar ke Google Cloud Storage
+          const file = req.file;
+          const fileName = `${Date.now()}_${file.originalname}`;
+          const uploadOptions = {
+            destination: fileName,
+            gzip: true,
+            metadata: {
+              contentType: file.mimetype
+            }
+          };
+
+          storage.bucket(bucketName).upload(file.buffer, uploadOptions, (err, uploadedFile) => {
+            if (err) {
+              res.status(500).send("error upload gambar");
+            } else {
+              const imgUrl = `https://storage.googleapis.com/${bucketName}/${fileName}`;
+              users.img = imgUrl;
+
+              query = `INSERT INTO user (id, nama, img, role, nomer_hp, username, password) VALUES ('${users.id}', '${users.name}', '${users.img}', '${users.role}', '${users.nomorHP}', '${users.username}', '${users.password}')`;
+
+              db.query(query, (err, results) => {
+                if (err) {
+                  res.status(500).send("error input data " + err);
+                } else {
+                  const response = {
+                    message: "data user berhasil di input",
+                    results: results
+                  };
+                  res.status(201).json(response);
+                }
+              });
+            }
+          });
+        } else {
+          res.status(400).send("gambar tidak ditemukan");
+        }
+      }
+    }
+  });
+});
+
+router.get("/",(req,res)=>{
+  const query = "SELECT  * FROM user"
+
+  db.query(query, (err,result)=>{
+    if(err){
+      res.status(500).send("Gagal mengambil data " + err)
+      return
+    }
+    res.status(200).json(result);
+  })
+})
+
+
+
+router.put("/ubah/",(req,res) => {
+  //pr harus cek username tersedia apa kaga
+  /*
+  
+  id:107
+  nama:hudzaa
+  role:admin
+  nomorHP:324
+  username:hudzaa
+  password:123
+  img: file
+  
+  */
+
+  const user = {
+    id : req.body.id,
+    name : req.body.namq,
+    img : req.body.img,
+    role : req.body.role,
+    nomorHP : req.body.nomorHP,
+    username : req.body.username,
+    password : req.body.password,
+  }
+
+  console.log(user.id)
+
+
+  //cek user
+  let query = `SELECT * FROM user WHERE id = '${user.id}'`;
+  db.query(query , (err, results) => {
+    if(err){
+      return res.status(500).send("kesalahan dalam mengambil data user", err)
+    }
+    else if(results.length <1){
+      const response = {
+        message : "id user tidak di temukan bang",
+      }
+
+
+      return res.status(404).json(response)
+    }
+    else{
+
+      console.log('id di temukan, melakukan perubahan data  pada id ' + user.id)
+      query = `UPDATE user SET nama = '${user.name}' , img = '${user.img}', role = '${user.role}', 
+      username = '${user.username}', password = ${user.password} WHERE user.id = '${user.id}'`
+      
+      db.query(query, (err,results)=>{
+        if(err){
+          return res.status(500).send("kesalahan saat merubah data berita ke database" + err)
+        }
+        const response = {
+          message : `data user dengan id : ${user.id} berhasil di update`,
+          results : results
+        }
+        return res.status(200).json(response);
+      })
+    }
+  })
+})
+
+
+router.delete("/delete",verifikasiUser, (req,res)=>{
+  /*
+  
+  {
+    pake petik ya bang
+    "userId" : ["035","482","881"]
+  }
+  
+  */
+
+  const id = req.body.userId;
+
+ 
+  
+  
+  const listId = []
+    for(let i=0;i<id.length;i++){
+      
+
+
+      let message = ""
+      const query = `DELETE FROM user WHERE user.id = ${id[i]}`;
+      db.query(query, (err,results)=>{
+        if(err){
+          res.status(200).send("gagal delete data " + err);
+        }else if (results.affectedRows == 0){
+          message = {
+            hapus : false,
+            id : id[i],
+            message : `id ${id[i]} tidak di temukan `,
+            result : results
+          }
+        }else{
+         
+         
+    
+          message = {
+            hapus : true,
+            id : id[i],
+            message : `${id[i]} berhasil di hapus `,
+            result : results
+          }
+
+
+        }
+        listId.push(message)
+        //console.log(message)
+
+        if(i == id.length-1){
+          res.status(200).json(listId)
+        }
+
+      })
+     
+    }
+  
+
+
+})
+
+router.get("/userDetail/:id",  (req, res) => {
+  const userId = req.params.id;
+
+  db.query(
+    "SELECT * FROM user WHERE id = ?",
+    [userId],
+    (error, results) => {
+      if (error) {
+        console.error("Error retrieving user detail:", error);
+        res.status(500).send({ status: "Failed", msg: error });
+      } else if (results.length === 0) {
+        res.status(404).send({ status: "Failed", msg: "User not found" });
+      } else {
+        const userDetail = results[0];
+        res.status(200).send({ status: "Success", data: userDetail });
+      }
+    }
+  );
+});
+
+//get user by nama
+router.get("/search/nama/:nama", (req,res)=> {
+const nama = `%${req.params.nama}%`
+const query = `SELECT * FROM user WHERE nama LIKE '${nama}'`
+console.log(query)
+db.query( query, (err, results)=>{
+  if(err){
+    res.status(500).send('Terjadi kesalahan saat mengambil data nama user');
+  }else{
+    res.status(200).json(results)
+  }
+});
+})
+
+
+
+router.post("/login",  (req,res)=>{
+
+  const user = {
+    id  : "",
+    username : req.body.username,
+    password : req.body.password,
+  }
+
+  const query = `SELECT * FROM user WHERE username = '${user.username}' AND password = ${user.password}`;
+    
+    db.query(query , (err, results) => {
+      if(err){
+        return res.status(500).send("gagal melakukan login" + err)
+      }
+      if(results.length != 0){
+        const responUser = {
+          id : results[0].id,
+          username : user.username,
+        }
+        jawt.sign(responUser,"himitsu", {expiresIn:'3d'}, (err, token)=>{
+            if(err){
+              console.log(err)
+              res.status(500).send(`err membuat token ${err}`)
+              return
+            }else{
+              const Token = token;
+              res.json({
+                user:responUser,
+                token:Token
+              })
+              return
+            }
+          })
+
+      }else{
+        return res.status(201).json("username dan password tidak di temukan");
+      }
+      
+    })
+
+})
+
+module.exports = router;
+
+
+
+router.put("/ubah",verifikasiUser,multer().any(),(req,res) => {
+    if(req.body.username == undefined || req.body.username == '' || req.body.password == undefined || req.body.password == ""){
+        res.status(404).json({
+            result : false,
+            keterangan : "username dan password tidak boleh"
+        })
+        return
+    }
+
+  const user = {
+    id : req.body.id,
+    name : req.body.nama,
+    img : req.files[0],
+    role : req.body.role,
+    nomorHP : req.body.nomorHP,
+    username : req.body.username,
+    password : req.body.password,
+  }
+
+  if(req.body.role == undefined){
+        user.role = "konsumen"
+    }
+
+  console.log(user.id)
+
+
+  //cek user
+  let query = `SELECT * FROM user WHERE id = '${user.id}'`;
+  db.query(query , (err, results) => {
+    if(err){
+      return res.status(500).json({
+        result : false,
+        keterangan : "gagal mengambil datadari database"
+    });
+    }
+    else if(results.length <1){
+        res.status(500).json({
+            result : false,
+            keterangan : "id user tidak di temukan bang"
+        });
+      
+    }
+    else{
+
+        //hapus gambar lama dari bucket
+         const storage = new Storage({
+            keyFilename: 'serviceaccountkey.json', // Ganti dengan path ke file kredensial GCP Anda
+            projectId: 'tepar-388403', // Ganti dengan ID proyek GCP Anda
+          });
+
+                const bucketName = 'image-paddy';
+                const objectName =  results[0].img.split("https://storage.googleapis.com/image-paddy/")[1];
+                console.log(objectName)
+
+
+            storage.bucket(bucketName).file(objectName).delete((error) => {
+                if (error) {
+                console.error('Error deleting file:', error);
+                res.status(500).json({
+                    result : false,
+                    keterangan : "gagal menghapus gambar lama pada bucket"
+                });
+                } else {
+                // upload gambar baru
+                
+                //upload gambar baru ke bucket
+            //fungsi upload bucket
+    
+            async function uploadFileToBucket(fileObject, destinationPath) {
+                const bucketName = 'image-paddy'; // Ganti dengan nama bucket GCP Anda
+            
+                try {
+                const bucket = storage.bucket(bucketName);
+                const file = bucket.file(destinationPath);
+            
+                await file.save(fileObject.buffer, {
+                    metadata: {
+                    contentType: fileObject.mimetype,
+                    },
+                });
+                
+                //hapus
+
+                console.log(`File uploaded to ${destinationPath} successfully.`);
+
+                console.log('id di temukan, melakukan perubahan data  pada id ' + user.id)
+                query = `UPDATE user SET nama = '${user.name}' , img = 'https://storage.googleapis.com/image-paddy/${destinationPath}', role = '${user.role}', 
+                username = '${user.username}', password = '${user.password}' WHERE user.id = '${user.id}'`
+                
+                db.query(query, (err,results)=>{
+                  if(err){
+                    res.status(500).json({
+                        result : false,
+                        keterangan : "gagal melakukan ubah data user ke database"
+                    });
+                  }
+                  res.status(201).json({
+                    result : true,
+                    keterangan : "berhasil mengubah data user"
+                });
+                })
+
+
+                } catch (error) {
+                console.error('Error uploading file:', error);
+                }
+                }
+            const dateTime = Date.now();
+            const destinationPath = `user-id-${user.id}-${dateTime}-${user.img.originalname}`; // Ganti dengan path dan nama file tujuan di bucket GCP Anda
+
+            uploadFileToBucket(user.img, destinationPath); //ini pasti berhasil
+                
+                }
+            });
+
+            
+
+    }
+  })
+})

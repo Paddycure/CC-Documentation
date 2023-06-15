@@ -1,0 +1,320 @@
+const express = require('express');
+const router = express.Router();
+const verifikasiUser = require('./verifikasi/verivikasi')
+const db = require('./../databaseDanConfignya/connection')
+const numbers = require('nanoid-generate/numbers');
+const { Storage } = require('@google-cloud/storage');
+const jawt = require('jsonwebtoken');
+const multer = require("multer");
+const upload = multer();
+const storage = new Storage({
+    keyFilename: 'serviceaccountkey.json', // Ganti dengan path ke file kredensial GCP Anda
+    projectId: 'tepar-388403', // Ganti dengan ID proyek GCP Anda
+  });
+
+
+
+  router.post("/register",multer().any(),(req,res)=>{
+
+    if(req.body.username == undefined || req.body.username == '' || req.body.password == undefined || req.body.password == ""){
+        res.status(404).json({
+            result : false,
+            keterangan : "username dan password tidak boleh kosong"
+        })
+        return
+    }
+    
+
+    const users = {
+      id : numbers(10),
+      name : req.body.nama,
+      role : req.body.role,
+      nomorHP : req.body.nomorHP,
+      username : req.body.username,
+      password : req.body.password,
+    }
+
+    if(req.body.role == undefined){
+        users.role = "konsumen"
+    }
+    
+
+    let query = `SELECT * FROM user WHERE username = '${users.username}'`;
+    db.query(query,(err,result)=>{
+      if(err){
+        res.status(500).json({
+            result : false,
+            keterangan : "Kesalahan saat query mencari username dan password bang"
+        });
+      }else{
+
+        if(result.length > 0){
+
+          res.status(201).json({
+            result : false,
+            keterangan : "Username telah di gunakan bang"
+        });
+
+        }else{
+          
+          //console.log(result)
+          query = `INSERT INTO user (id, nama,  role, nomer_hp, username, password) VALUES ('${users.id}', '${users.name}', '${users.role}', '${users.nomorHP}', '${users.username}', '${users.password}')`;
+
+          db.query(query,(err,results)=>{
+            if(err){
+              res.status(500).json({
+                result : false,
+                keterangan : "kesalahan saat melakukan input data ke database"
+            });
+            }else{
+                res.status(200).json({
+                    result : true,
+                    keterangan : "Berhasil Menambahkan user",
+                    data : users
+                });
+              
+            }
+
+          })
+
+        }
+
+      }
+
+    })
+  });
+  
+
+router.get("/",verifikasiUser,(req,res)=>{
+  const query = "SELECT  * FROM user"
+
+  db.query(query, (err,result)=>{
+    if(err){
+    res.status(500).json({
+        result : false,
+        keterangan : "gagal mengambil datadari database"
+    });
+      return
+    }
+    res.status(500).json({
+        result : true,
+        keterangan : "Berhasil mengambil data users",
+        data : result
+    });
+  })
+})
+
+
+router.put("/ubah",verifikasiUser,upload.any(),(req,res) => {
+    if(req.username == undefined || req.username == '' || req.password == undefined || req.password == ""){
+        res.status(404).json({
+            result : false,
+            keterangan : "username dan password tidak boleh"
+        })
+        return
+    }
+  const user = {
+    id : req.body.id,
+    name : req.body.nama,
+    role : req.body.role,
+    nomorHP : req.body.nomorHP,
+    username : req.body.username,
+    password : req.body.password,
+  }
+
+  if(req.body.role == undefined){
+        user.role = "konsumen"
+    }
+
+  
+  console.log(user.id)
+
+
+  //cek user
+  let query = `SELECT * FROM user WHERE id = '${user.id}'`;
+  db.query(query , (err, results) => {
+    if(err){
+      return res.status(500).json({
+        result : false,
+        keterangan : "gagal mengambil datadari database"
+    });
+    }
+    else if(results.length <1){
+        res.status(500).json({
+            result : false,
+            keterangan : "id user tidak di temukan bang"
+        });
+      
+    }
+    else{
+        console.log('id di temukan, melakukan perubahan data  pada id ' + user.id)
+                query = `UPDATE user SET nama = '${user.name}' , nomer_hp'${user.nomorHP}' ,role = '${user.role}', 
+                username = '${user.username}', password = '${user.password}' WHERE user.id = '${user.id}'`
+                
+                db.query(query, (err,results)=>{
+                  if(err){
+                    res.status(500).json({
+                        result : false,
+                        keterangan : "gagal melakukan ubah data user ke database"
+                    });
+                  }
+                  res.status(201).json({
+                    result : true,
+                    keterangan : "berhasil mengubah data user"
+                });
+                })
+
+    }
+  })
+})
+  
+
+
+router.delete("/delete/:id",verifikasiUser, (req, res) => {
+    const id = req.params.id;
+ 
+
+        // Hapus data pengguna dari database
+        const deleteQuery = `DELETE FROM user WHERE id = '${id}'`;
+        db.query(deleteQuery, (err, results) => {
+          if (err) {
+              res.status(500).json({
+                  result : false,
+                  keterangan : "gagal menghapus user"
+              });
+          } else {
+              res.status(201).json({
+                  result : true,
+                  keterangan : "user berhasil di hapus"
+              });
+          }
+        });
+    
+    });
+    
+
+
+router.get("/userDetail/:id",verifikasiUser,  (req, res) => {
+  const userId = req.params.id;
+
+  db.query(
+    "SELECT * FROM user WHERE id = ?",
+    [userId],
+    (error, results) => {
+      if (error) {
+        console.error("Error retrieving user detail:", error);
+        res.status(500).json({
+            result : false,
+            keterangan : "gagal mengambil datadari database"
+        });;
+      } else if (results.length === 0) {
+        res.status(500).json({
+            result : false,
+            keterangan : "id user tidak di temukan"
+        });
+      } else {
+        const userDetail = results[0];
+        res.status(200).json({
+            result : true,
+            keterangan : "ketemu bang",
+            data : userDetail
+        });
+      }
+    }
+  );
+});
+
+//get user by nama
+router.get("/search/nama/:nama",verifikasiUser, (req,res)=> {
+const nama = `%${req.params.nama}%`
+const query = `SELECT * FROM user WHERE nama LIKE '${nama}'`
+console.log(query)
+db.query( query, (error, results)=>{
+    if (error) {
+        console.error("Error retrieving user detail:", error);
+        res.status(500).json({
+            result : false,
+            keterangan : "gagal mengambil datadari database"
+        });;
+      } else if (results.length === 0) {
+        res.status(500).json({
+            result : false,
+            keterangan : "nama user tidak di temukan"
+        });
+      } else {
+        //const userDetail = results[0];
+        res.status(200).json({
+            result : true,
+            keterangan : "ketemu bang",
+            data : results
+        });
+      }
+});
+})
+
+
+
+router.post("/login", upload.any(), (req,res)=>{
+    if(req.body.username == undefined || req.body.username == '' || req.body.password == undefined || req.body.password == ""){
+        res.status(404).json({
+            result : false,
+            keterangan : "username dan password tidak boleh kosong"
+        })
+        return
+    }
+  
+    const user = {
+      username : req.body.username,
+      password : req.body.password,
+    };
+  
+    const query = `SELECT * FROM user WHERE username = '${user.username}' AND password = '${user.password}'`;
+      
+      db.query(query , (err, results) => {
+        if(err){
+          return res.status(500).json({
+            result : false,
+            keterangan : "gagal mengambil datadari database"
+        });
+        }
+        if(results.length > 0){
+          const responUser = {
+            id : results[0].id,
+            username : user.username,
+          }
+          jawt.sign(responUser,"himitsu", {expiresIn:'5d'}, (err, token)=>{
+              if(err){
+                console.log(err)
+                res.status(500).json({
+                    result : false,
+                    keterangan : "gagal bikin token"
+                });
+                return
+              }else{
+                const Token = token;
+                res.json({
+                 result : true,
+                  user:responUser,
+                  token:Token
+                })
+                return
+              }
+            })
+  
+            }else{
+                console.log(results)
+          return res.status(500).json({
+            result : false,
+            keterangan : "username password tidak di temukan"
+        });
+        }
+        
+      })
+  
+  })
+  
+  
+
+  
+
+module.exports = router;
