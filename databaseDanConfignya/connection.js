@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+//konfig koneksi ke db
 const dbConfig = {
     host: "ip address",
     user: "user sql",
