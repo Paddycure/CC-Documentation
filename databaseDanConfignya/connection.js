@@ -1,9 +1,9 @@
 const mysql = require("mysql");
 const dbConfig = {
-    host: "",
-    user: "",
-    password: "",
-    database: "",
+    host: "ip address",
+    user: "user sql",
+    password: "pass",
+    database: "database paddy",
   };
   
   const db = mysql.createConnection(dbConfig);
